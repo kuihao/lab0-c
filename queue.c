@@ -17,11 +17,37 @@
  */
 struct list_head *q_new()
 {
-    return NULL;
+    /* read and write head of queue */
+    struct list_head *q_head = malloc(sizeof(struct list_head));
+    if (q_head) {
+        INIT_LIST_HEAD(q_head);
+    }
+    return q_head;
+    // element_t *rw_head = malloc(sizeof(element_t));
+    // if (!rw_head) {
+    //   return NULL;
+    //}
+    // struct list_head **indirect = &(rw_head->list;
+    // INIT_LIST_HEAD(&rw_head->list);
+    // return &(rw_head->list);
 }
 
 /* Free all storage used by queue */
-void q_free(struct list_head *l) {}
+void q_free(struct list_head *l)
+{
+    if (!l) {
+        return;
+    }
+    struct list_head *ptr = l->next;
+    while (l != ptr) {
+        l->next = ptr->next;
+        free(list_entry(ptr, element_t, list)->value);
+        free(list_entry(ptr, element_t, list));
+        ptr = l->next;
+    }
+    free(l);
+    return;
+}
 
 /*
  * Attempt to insert element at head of queue.
