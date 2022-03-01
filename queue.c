@@ -17,7 +17,6 @@
  */
 struct list_head *q_new()
 {
-    /* read and write head of queue */
     struct list_head *q_head = malloc(sizeof(struct list_head));
     if (q_head) {
         INIT_LIST_HEAD(q_head);
@@ -35,15 +34,13 @@ struct list_head *q_new()
 /* Free all storage used by queue */
 void q_free(struct list_head *l)
 {
-    if (!l) {
-        return;
-    }
-    struct list_head *ptr = l->next;
-    while (l != ptr) {
-        l->next = ptr->next;
-        free(list_entry(ptr, element_t, list)->value);
-        free(list_entry(ptr, element_t, list));
-        ptr = l->next;
+    struct list_head **indirect = &l;
+    /* Traverse stop if the next pointer point to head itself */
+    while ((*indirect)->next != l) {
+        indirect = &(*indirect)->next;
+        free(list_entry((*indirect)->prev, element_t, list)->value);
+        free(list_entry((*indirect)->prev, element_t, list));
+        //  e.g. head_l -> [0] <-> [1] <-> [2] <--> [0]
     }
     free(l);
     return;
