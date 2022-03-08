@@ -76,14 +76,15 @@ bool q_insert_tail(struct list_head *head, char *s)
     if (!head)
         return false;
     element_t *new_node = malloc(sizeof(element_t));
-    if (new_node) {
-        INIT_LIST_HEAD(&new_node->list);
-        new_node->value = strdup(s);
-        list_add_tail(&new_node->list, head);
-        return true;
-    } else {
+    if (!new_node)
+        return false;
+    INIT_LIST_HEAD(&new_node->list);
+    new_node->value = strdup(s);
+    if (!new_node->value) {
+        free(new_node);
         return false;
     }
+    list_add_tail(&new_node->list, head);
     return true;
 }
 
