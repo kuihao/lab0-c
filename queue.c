@@ -49,15 +49,19 @@ void q_free(struct list_head *l)
  */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
     element_t *new_node = malloc(sizeof(element_t));
-    if (new_node) {
-        INIT_LIST_HEAD(&new_node->list);
-        new_node->value = strdup(s);
-        list_add(&new_node->list, head);
-        return true;
-    } else {
+    if (!new_node)
+        return false;
+    INIT_LIST_HEAD(&new_node->list);
+    new_node->value = strdup(s);
+    if (!new_node->value) {
+        free(new_node);
         return false;
     }
+    list_add(&new_node->list, head);
+    return true;
 }
 
 /*
@@ -69,6 +73,8 @@ bool q_insert_head(struct list_head *head, char *s)
  */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
     element_t *new_node = malloc(sizeof(element_t));
     if (new_node) {
         INIT_LIST_HEAD(&new_node->list);
@@ -97,13 +103,14 @@ bool q_insert_tail(struct list_head *head, char *s)
  */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    if (head) {
+    if (head && !list_empty(head)) {
         element_t *node = list_entry(head->next, element_t, list);
         list_del(head->next);
         if (sp) {
-            strncpy(sp, node->value, bufsize);
-            // strncpy(sp, node->value, bufsize - 1);
-            sp[bufsize - 1] = '\0';
+            int len = strlen(node->value) + 1;
+            len = fmin(bufsize, len);
+            strncpy(sp, node->value, len);
+            sp[len - 1] = '\0';
         }
         return node;
     } else {
@@ -121,8 +128,10 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
         element_t *node = list_entry(head->prev, element_t, list);
         list_del(head->prev);
         if (sp != NULL) {
-            strncpy(sp, node->value, bufsize - 1);
-            sp[bufsize - 1] = '\0';
+            int len = strlen(node->value) + 1;
+            len = fmin(bufsize, len);
+            strncpy(sp, node->value, len);
+            sp[len - 1] = '\0';
         }
         return node;
     } else {
