@@ -283,7 +283,7 @@ void q_reverse(struct list_head *head)
 
 struct list_head *Merge2Lists(struct list_head *list1, struct list_head *list2)
 {
-    struct list_head **ptr = &head, **node;
+    struct list_head *head = NULL, **ptr = &head, **node;
     for (node = NULL; list1 && list2; *node = (*node)->next) {
         node =
             signbit((float) strcmp(list_entry(list1, element_t, list)->value,
