@@ -125,14 +125,15 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
  */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    if (head) {
+    /* Ref. https://hackmd.io/@blueskyson/linux2022-lab0 */
+    if (head && !list_empty(head)) {
         element_t *node = list_entry(head->prev, element_t, list);
         list_del(head->prev);
-        if (sp != NULL) {
-            int len = strlen(node->value) + 1;
-            len = fmin(bufsize, len);
-            strncpy(sp, node->value, len);
-            sp[len - 1] = '\0';
+        if (sp && bufsize) {
+            // int len = strlen(node->value) + 1;
+            // len = fmin(bufsize, len);
+            strncpy(sp, node->value, bufsize - 1);
+            sp[bufsize - 1] = '\0';
         }
         return node;
     } else {
