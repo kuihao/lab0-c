@@ -104,19 +104,17 @@ bool q_insert_tail(struct list_head *head, char *s)
  */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    if (head && !list_empty(head)) {
-        element_t *node = list_entry(head->next, element_t, list);
-        list_del(head->next);
-        if (sp) {
-            int len = strlen(node->value) + 1;
-            len = fmin(bufsize, len);
-            strncpy(sp, node->value, len);
-            sp[len - 1] = '\0';
-        }
-        return node;
-    } else {
+    if (!head || list_empty(head)) {
         return NULL;
     }
+
+    element_t *node = list_entry(head->next, element_t, list);
+    list_del(head->next);
+    if (sp && bufsize) {
+        strncpy(sp, node->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+    }
+    return node;
 }
 
 /*
@@ -126,20 +124,17 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
     /* Ref. https://hackmd.io/@blueskyson/linux2022-lab0 */
-    if (head && !list_empty(head)) {
-        element_t *node = list_entry(head->prev, element_t, list);
-        list_del(head->prev);
-        if (sp && bufsize) {
-            // int len = strlen(node->value) + 1;
-            // len = fmin(bufsize, len);
-            strncpy(sp, node->value, bufsize - 1);
-            sp[bufsize - 1] = '\0';
-        }
-        return node;
-    } else {
+    if (!head || list_empty(head)) {
         return NULL;
     }
-    return NULL;
+
+    element_t *node = list_entry(head->prev, element_t, list);
+    list_del(head->prev);
+    if (sp && bufsize) {
+        strncpy(sp, node->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+    }
+    return node;
 }
 
 /*
@@ -189,8 +184,7 @@ bool q_delete_mid(struct list_head *head)
             current = current->next;
         }
         list_del(current);
-        free(list_entry(current, element_t, list)->value);
-        free(list_entry(current, element_t, list));
+        q_release_element(list_entry(current, element_t, list));
         return true;
     }
 }
